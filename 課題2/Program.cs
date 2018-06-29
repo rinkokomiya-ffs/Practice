@@ -18,20 +18,63 @@ namespace Data_practice
             // 人物リスト生成
             var People = ReadCsvFile(textFile);
 
-            // お小遣いの平均を表示
+            // 会社ごとのリスト生成
+            var FFSPeople = makePerCompany(People, "FF");
+            var FFPeople = makePerCompany(People, "FFS");
 
-            // お小遣いの最大値を表示
-            ShowMoney(CalcMoney(People, "最大値"), "最大値");
+            // 会社ごとにお小遣いの最大値を表示
+            Console.WriteLine("FF");
+            ShowMoney(CalcMoney(FFPeople, "最大値"), "最大値");
+            Console.WriteLine("FFS");
+            ShowMoney(CalcMoney(FFSPeople, "最大値"), "最大値");
         }
 
         /// <summary>
-        /// 格納した値とその対象人物をコンソールに出力する
+        /// 会社ごとのリストを生成する
+        /// </summary>
+        /// <param name="People"></param>
+        /// <param name="companyName"></param>
+        /// <returns></returns>
+        private static List<Person> makePerCompany(List<Person> People, string companyName)
+             => People.Where(p => p.company == companyName).ToList();
+
+        public static void Execute(List<Person> People, string companyName)
+        {
+            // リスト生成
+            var targetPeople = makePerCompany(People, companyName);
+
+            // 平均値を計算する
+            string str = "平均値";
+            // 平均値を表示する
+            var value = CalcMoney(targetPeople, str);
+            ShowMoney(value, str);
+
+            // 最大値を計算する
+            string str1 = "最大値";
+            // 最大値を表示する
+            var value1 = CalcMoney(targetPeople, str1);
+            ShowMoney(value1, str1);
+            ShowName(SetTargetPeople(targetPeople, value), str1);
+                
+        }
+
+        /// <summary>
+        /// 格納した値をコンソールに出力する
         /// </summary>
         /// <param name="targetPeople"></param>
         /// <param name="type"></param>
-        public static void ShowMoney(List<Person> targetPeople, string type)
+        public static void ShowMoney(int value, string type)
         {
-            Console.WriteLine("お小遣いの" + type + "：" + targetPeople[0].money);
+            Console.WriteLine("お小遣いの" + type + "：" + value);
+        }
+
+        /// <summary>
+        /// 名前をコンソールに出力する
+        /// </summary>
+        /// <param name="targetPeople"></param>
+        /// <param name="type"></param>
+        public static void ShowName(List<Person> targetPeople, string type)
+        {
             Console.WriteLine("お小遣いが" + type + "の人:");
             foreach (var p in targetPeople)
             {
@@ -40,32 +83,36 @@ namespace Data_practice
         }
 
         /// <summary>
-        /// お小遣いの最大値もしくは最小値を計算する
+        /// 引数に応じた値を計算する
         /// </summary>
         /// <param name="People"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static List<Person> CalcMoney(List<Person> People, string type)
+        public static int CalcMoney(List<Person> People, string type)
         {
-            int targetValue = 0;
             switch (type)
             {
                 case "平均値":
-                    targetValue = (int)People.Average(x => x.money);
-                    break;
+                    return (int)People.Average(x => x.money);
 
                 case "最大値":
-                    targetValue = People.Max(x => x.money);
-                    break;
+                    return People.Max(x => x.money);
 
                 case "最小値":
-                    targetValue = People.Min(x => x.money);
-                    break;
+                    return People.Min(x => x.money);
                 default:
                     throw new ArgumentException("型指定が正しくありません");
             }
+        }
 
-            // 最大値もしくは最小値の人物情報をリストに格納
+        /// <summary>
+        /// お小遣いの金額に一致する人物情報をリストに格納
+        /// </summary>
+        /// <param name="People"></param>
+        /// <param name="targetValue"></param>
+        /// <returns></returns>
+        public static List<Person> SetTargetPeople(List<Person> People,int targetValue)
+        {
             return People.Where(p => p.money == targetValue).ToList();
         }
 
@@ -88,9 +135,9 @@ namespace Data_practice
 
             using (StreamReader sr = new StreamReader(fileName))
             {
-            	// 行数をカウント
-            	int lineNum = 0;
-                
+                // 行数をカウント
+                int lineNum = 0;
+
                 // ファイルの末尾まで読み込む
                 while (sr.Peek() > -1)
                 {
@@ -105,7 +152,7 @@ namespace Data_practice
                     }
 
                     // データを格納する
-                    
+
                     // コンマ区切りのデータを格納
                     string[] Data = line.Split(',');
 
@@ -132,7 +179,7 @@ namespace Data_practice
             }
 
             // nullだったらメッセージを表示して終了
-            if(people == null)
+            if (people == null)
             {
                 Console.WriteLine("Error: 計算できるデータはありません。");
                 Environment.Exit(-1);
@@ -152,38 +199,38 @@ namespace Data_practice
         }
     }
 
-    
+
     /// <summary>
     /// 個人情報を格納するクラス
     /// </summary>
     public class Person
     {
-    	public int id {get; set;}
-    	public string name {get; set;}
-    	public int money {get; set;}
-    	public string company {get; set;}
-    	
-    	public Person(int id, string name, int money)
-    	{
-    		this.id = id;
-    		this.name = name;
-    		this.money = money;
-    		company = CheckCompany(id);
-    	}
-    	
-    	/// <summary>
+        public int id { get; set; }
+        public string name { get; set; }
+        public int money { get; set; }
+        public string company { get; set; }
+
+        public Person(int id, string name, int money)
+        {
+            this.id = id;
+            this.name = name;
+            this.money = money;
+            company = CheckCompany(id);
+        }
+
+        /// <summary>
         /// 社員番号の上3桁から会社名を判別する
         /// </summary>
         /// <param name="id">社員番号</param>
-    	private string CheckCompany(int id)
-    	{
-    		int topThreeDigit = id / 1000000;
-    		if(topThreeDigit == 128)
+        private string CheckCompany(int id)
+        {
+            int topThreeDigit = id / 100000;
+            if (topThreeDigit == 128)
             {
                 return "FFS";
 
             }
-            else if(topThreeDigit == 120)
+            else if (topThreeDigit == 100)
             {
                 return "FF";
 
