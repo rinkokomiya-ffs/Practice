@@ -19,86 +19,54 @@ namespace Data_practice
             var People = ReadCsvFile(textFile);
 
             // お小遣いの平均を表示
-            ShowMoneyAverage(People);
 
             // お小遣いの最大値を表示
-            ShowMoneyMax(People);
+            ShowMoney(CalcMoney(People, "最大値"), "最大値");
         }
 
         /// <summary>
-        /// お小遣いの平均値を表示する
+        /// 格納した値とその対象人物をコンソールに出力する
         /// </summary>
-        /// <param name="money">格納した人物リスト</param>
-        public static void ShowMoneyAverage(List<Person> People)
+        /// <param name="targetPeople"></param>
+        /// <param name="type"></param>
+        public static void ShowMoney(List<Person> targetPeople, string type)
         {
-            // 格納した値段の平均値をコンソールに出力する
-            Console.WriteLine("お小遣いの平均値:" + People.Average(x => x.money));
-        }
-
-        /// <summary>
-        /// お小遣いの最大値を表示する
-        /// </summary>
-        /// <param name="People">格納した人物リスト</param>
-        public static void ShowMoneyMax(List<Person> People)
-        {
-            // 最大値を格納
-            var maxValue = People.Max(x => x.money);
-
-            // 最大値のときの人物情報をリストに格納
-            List<Person> richPeople = new List<Person>();
-            richPeople = People.Where(p => p.money == maxValue).ToList();
-
-            // 格納した値段の最大値とその人物をコンソールに出力する
-            Console.WriteLine("お小遣いの最大値:" + maxValue );
-            Console.WriteLine("お小遣いが最大値の人:");
-            foreach (var p in richPeople)
+            Console.WriteLine("お小遣いの" + type + "：" + targetPeople[0].money);
+            Console.WriteLine("お小遣いが" + type + "の人:");
+            foreach (var p in targetPeople)
             {
                 Console.WriteLine(p.name);
             }
         }
 
         /// <summary>
-        /// お小遣いの最小値を表示する
+        /// お小遣いの最大値もしくは最小値を計算する
         /// </summary>
-        /// <param name="People">格納した人物リスト</param>
-        public static void ShowMoneyMin(List<Person> People)
-        {
-            // 最小値を格納
-            var minValue = People.Min(x => x.money);
-
-            // 最小値のときの人物情報をリストに格納
-            List<Person> poorPeople = new List<Person>();
-            poorPeople = People.Where(p => p.money == minValue).ToList();
-
-            // 格納した値段の最大値とその人物をコンソールに出力する
-            Console.WriteLine("お小遣いの最小値:" + minValue);
-            Console.WriteLine("お小遣いが最小値の人:");
-            foreach (var p in poorPeople)
-            {
-                Console.WriteLine(p.name);
-            }
-        }
-
+        /// <param name="People"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static List<Person> CalcMoney(List<Person> People, string type)
         {
-            int targetMoney = 0;
+            int targetValue = 0;
             switch (type)
             {
-                case "Max":
-                    // 最大値を格納
-                    targetMoney = People.Max(x => x.money);
+                case "平均値":
+                    targetValue = (int)People.Average(x => x.money);
                     break;
 
-                case "Min":
-                    // 最小値を格納
-                    targetMoney = People.Min(x => x.money);
+                case "最大値":
+                    targetValue = People.Max(x => x.money);
+                    break;
+
+                case "最小値":
+                    targetValue = People.Min(x => x.money);
                     break;
                 default:
                     throw new ArgumentException("型指定が正しくありません");
             }
 
             // 最大値もしくは最小値の人物情報をリストに格納
-            return People.Where(p => p.money == targetMoney).ToList();
+            return People.Where(p => p.money == targetValue).ToList();
         }
 
         /// <summary>
