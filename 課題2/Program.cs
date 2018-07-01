@@ -18,15 +18,9 @@ namespace Data_practice
             // 人物リスト生成
             var People = ReadCsvFile(textFile);
 
-            // 会社ごとのリスト生成
-            var FFSPeople = makePerCompany(People, "FF");
-            var FFPeople = makePerCompany(People, "FFS");
-
-            // 会社ごとにお小遣いの最大値を表示
-            Console.WriteLine("FF");
-            ShowMoney(CalcMoney(FFPeople, "最大値"), "最大値");
-            Console.WriteLine("FFS");
-            ShowMoney(CalcMoney(FFSPeople, "最大値"), "最大値");
+            // 会社ごとに結果を出力する
+            Execute(People, "FF");
+            Execute(People, "FFS");
         }
 
         /// <summary>
@@ -40,8 +34,10 @@ namespace Data_practice
 
         public static void Execute(List<Person> People, string companyName)
         {
-            // リスト生成
+            // 会社ごとのリスト生成
             var targetPeople = makePerCompany(People, companyName);
+            // 会社名を表示する
+            ShowCompanyName(companyName);
 
             // 平均値を計算する
             string str = "平均値";
@@ -54,9 +50,21 @@ namespace Data_practice
             // 最大値を表示する
             var value1 = CalcMoney(targetPeople, str1);
             ShowMoney(value1, str1);
-            ShowName(SetTargetPeople(targetPeople, value), str1);
+            ShowName(SetTargetPeople(targetPeople, value1), str1);
+            
+            // 最小値を計算する
+            string str2 = "最小値";
+            // 最小値を表示する
+            var value2 = CalcMoney(targetPeople, str2);
+            ShowMoney(value2, str2);
+            ShowName(SetTargetPeople(targetPeople, value2), str2);
                 
         }
+        
+        // 会社名をコンソールに出力する
+        private static void ShowCompanyName(string companyName)
+            => Console.WriteLine(companyName);
+
 
         /// <summary>
         /// 格納した値をコンソールに出力する
