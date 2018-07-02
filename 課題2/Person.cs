@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Data_practice
 {
     /// <summary>
-    /// 個人情報を格納するクラス
+    /// 人物情報を格納するクラス
     /// </summary>
     public class Person
     {
@@ -27,18 +22,17 @@ namespace Data_practice
         /// 社員番号の上3桁から会社名を判別する
         /// </summary>
         /// <param name="id">社員番号</param>
+        /// <returns>会社名</returns>
         private string CheckCompany(int id)
         {
             int topThreeDigit = id / 100000;
             if (topThreeDigit == 128)
             {
                 return "FFS";
-
             }
             else if (topThreeDigit == 100)
             {
                 return "FF";
-
             }
             else
             {

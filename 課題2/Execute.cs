@@ -1,63 +1,64 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data_practice
 {
+    /// <summary>
+    /// パラメータ計算および表示をするクラス
+    /// </summary>
     public class Execute
     {
+        /// <summary>
+        /// 各パラメータの計算および表示
+        /// </summary>
+        /// <param name="People">全人物リスト</param>
+        /// <param name="companyName">会社名</param>
         public static void OutputResult(List<Person> People, string companyName)
-        {   
+        {
             // 会社ごとのリスト生成
-            var targetPeople = makePerCompany(People, companyName);
-            // 会社名を表示する
+            var CompanyPeople = CreateCompanyPeople(People, companyName);
             ShowCompanyName(companyName);
 
-            // 平均値を計算する
             string str = "平均値";
-            // 平均値を表示する
-            var value = CalcMoney(targetPeople, str);
+            var value = CalcMoney(CompanyPeople, str);
             ShowMoney(value, str);
 
-            // 最大値を計算する
             string str1 = "最大値";
-            // 最大値を表示する
-            var value1 = CalcMoney(targetPeople, str1);
+            var value1 = CalcMoney(CompanyPeople, str1);
             ShowMoney(value1, str1);
-            ShowName(SetTargetPeople(targetPeople, value1), str1);
-            
-            // 最小値を計算する
+            ShowName(SetTargetPeople(CompanyPeople, value1), str1);
+
             string str2 = "最小値";
-            // 最小値を表示する
-            var value2 = CalcMoney(targetPeople, str2);
+            var value2 = CalcMoney(CompanyPeople, str2);
             ShowMoney(value2, str2);
-            ShowName(SetTargetPeople(targetPeople, value2), str2);
+            ShowName(SetTargetPeople(CompanyPeople, value2), str2);
         }
 
         /// <summary>
-        /// 会社ごとのリストを生成する
+        /// 会社ごとの人物リストを生成する
         /// </summary>
-        /// <param name="People"></param>
-        /// <param name="companyName"></param>
-        /// <returns></returns>
-        private static List<Person> makePerCompany(List<Person> People, string companyName)
+        /// <param name="People">全人物リスト</param>
+        /// <param name="companyName">会社名</param>
+        /// <returns>会社ごとの人物リスト</returns>
+        private static List<Person> CreateCompanyPeople(List<Person> People, string companyName)
              => People.Where(p => p.company == companyName).ToList();
-             
-        
-        // 会社名をコンソールに出力する
+
+
+        /// <summary>
+        /// 会社名をコンソールに出力する
+        /// </summary>
+        /// <param name="companyName">会社名</param>
         private static void ShowCompanyName(string companyName)
             => Console.WriteLine(companyName);
 
         /// <summary>
-        /// 引数に応じた値を計算する
+        /// 引数に応じたパラメータを計算する
         /// </summary>
-        /// <param name="People"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static int CalcMoney(List<Person> People, string type)
+        /// <param name="People">人物リスト</param>
+        /// <param name="type">パラメータの種類</param>
+        /// <returns>パラメータ計算結果</returns>
+        private static int CalcMoney(List<Person> People, string type)
         {
             switch (type)
             {
@@ -77,26 +78,26 @@ namespace Data_practice
         /// <summary>
         /// 格納した値をコンソールに出力する
         /// </summary>
-        /// <param name="targetPeople"></param>
-        /// <param name="type"></param>
-        public static void ShowMoney(int value, string type)
-            => Console.WriteLine("お小遣いの" + type + "：" + value);
+        /// <param name="resultValue">パラメータ計算結果</param>
+        /// <param name="type">パラメータの種類</param>
+        private static void ShowMoney(int resultValue, string type)
+            => Console.WriteLine("お小遣いの" + type + "：" + resultValue);
 
         /// <summary>
-        /// お小遣いの金額に一致する人物情報をリストに格納
+        /// 計算結果に一致する人物情報をリストに格納
         /// </summary>
-        /// <param name="People"></param>
-        /// <param name="targetValue"></param>
-        /// <returns></returns>
-        public static List<Person> SetTargetPeople(List<Person> People, int targetValue)
-            => People.Where(p => p.money == targetValue).ToList();
+        /// <param name="People">人物リスト</param>
+        /// <param name="resultValue">パラメータ計算結果</param>
+        /// <returns>パラメータ計算結果に一致する人物リスト</returns>
+        private static List<Person> SetTargetPeople(List<Person> People, int resultValue)
+            => People.Where(p => p.money == resultValue).ToList();
 
         /// <summary>
         /// 名前をコンソールに出力する
         /// </summary>
-        /// <param name="targetPeople"></param>
-        /// <param name="type"></param>
-        public static void ShowName(List<Person> targetPeople, string type)
+        /// <param name="targetPeople">パラメータ結果に一致する人物リスト</param>
+        /// <param name="type">パラメータの種類</param>
+        private static void ShowName(List<Person> targetPeople, string type)
         {
             Console.WriteLine("お小遣いが" + type + "の人:");
             foreach (var p in targetPeople)
