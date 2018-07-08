@@ -2,38 +2,41 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Data_practice
 {
     /// <summary>
-    /// ファイルを読み込んで人物リストを生成する
+    /// ファイルを読み込んでPersonのリストを作成するクラス
     /// </summary>
     public class PersonCreater
     {
         /// <summary>
-        /// 生成した人物リストを返す
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        public static List<Person> Create(string fileName)
-            => ConvertPerson(CheckAbnormalData(ReadCsvFile(fileName)));
-
-        /// <summary>
-        /// csv形式のファイルを読む
+        /// ファイルを読み込んでPersonリスト生成処理を実行する
         /// </summary>
         /// <param name="fileName">ファイル名</param>
-        /// <returns>ファイル1行ごとのリスト</returns>
-        private static List<string> ReadCsvFile(string fileName)
+        public static List<Person> Create(string fileName)
         {
-            // ファイルが存在するかどうか確認する
+            return ConvertPerson(IgnoreAbnormalData(ReadCsvFile(fileName)));
+        }
+
+        /// <summary>
+        /// ファイルを読み込む
+        /// </summary>
+        /// <param name="fileName">ファイル名</param>
+        public static List<string> ReadCsvFile(string fileName)
+        {
+            // 1. ファイルが存在するかどうか確認する
             if (!File.Exists(fileName))
             {
                 // ファイルが存在しない場合は終了する
                 ErrorExit("ファイルが存在しません。");
             }
-            
             // ファイルが存在する場合
-            List<string> lines = new List<string>();
+            // stringのリストを追加
+            List<string> strings = new List<string>();
 
             using (StreamReader sr = new StreamReader(fileName))
             {
@@ -41,44 +44,63 @@ namespace Data_practice
                 while (sr.Peek() > -1)
                 {
                     string line = sr.ReadLine();
-                    lines.Add(line);
+                    strings.Add(line);
                 }
             }
-            return lines;
+            return strings;
         }
-
+        
         /// <summary>
-        /// 異常データがあるか確認する
+        /// データのエラーチェックを行う
         /// </summary>
-        /// <param name="lines">ファイル1行ごとのリスト</param>
-        /// <returns>正常データ</returns>
-        private static List<string[]> CheckAbnormalData(List<string> lines)
+        /// <param name="strings">読み込んだデータ</param>
+        private static List<string[]> IgnoreAbnormalData(List<string> strings)
         {
-            List<string[]> CorrectData = new List<string[]>();
-
-            // 行数
+            List<string[]> correctStrings = new List<string[]>();
+            
             int lineNum = 0;
 
-            foreach (var line in lines)
+            foreach(var line in strings)
             {
                 lineNum++;
-                // 空行がある場合
+                // 2. 空行がある場合
                 if (line == "")
                 {
                     ShowErrorMessage(lineNum, "空行が含まれています。");
                     continue;
                 }
-
+                
+                // データを格納する
                 // コンマ区切りのデータを格納
                 string[] Data = line.Split(',');
 
-                // データが３つあるかどうか確認する
+                // 3. データが３つあるかどうか確認する
                 // ３つない場合
                 if (Data.Length != 3)
                 {
                     ShowErrorMessage(lineNum, "データがフォーマットに沿ってません。");
                     continue;
                 }
+
+                // Data Validation
+                // 4. 社員番号が1から始まる数字8桁かどうか
+                // 正規表現で判定する
+                bool isId = Regex.IsMatch(Data[0], "^1[0-9]{7}$");
+                if(!isId)
+                {
+                    ShowErrorMessage(lineNum, "社員番号が正しく入力されていません。");
+                    continue;
+                }
+
+                // 5. 名前が空かどうか
+                if(Data[1] == "")
+                {
+                    ShowErrorMessage(lineNum, "名前が入力されていません。");
+                    continue;
+                }
+
+                // 文字コードを判定して文字化けしないようにする
+                // Data[1] = ConvertEncoding(Data[1]);
 
                 int myMoney = 0;
                 // 値段が正常値かどうか確認する
@@ -88,38 +110,41 @@ namespace Data_practice
                     ShowErrorMessage(lineNum, "お小遣いの金額が正しく入力されていません。");
                     continue;
                 }
-
-                CorrectData.Add(Data);
+                // 値が正かどうか確認する
+                if(myMoney < 0)
+                {
+                    ShowErrorMessage(lineNum, "お小遣いの金額が負です");
+                    continue;
+                }
+                
+                correctStrings.Add(Data);
             }
-            return CorrectData;
+            return correctStrings;
         }
-
+        
         /// <summary>
-        /// 読み込んだ正常データを人物リストに変換する
+        /// Personのリストを生成する
         /// </summary>
-        /// <param name="CorrectData">正常データ</param>
-        /// <returns>人物リスト</returns>
-        private static List<Person> ConvertPerson(List<string[]> CorrectData)
+        /// <param name="correctStrings">正常なデータ</param>
+        private static List<Person> ConvertPerson(List<string[]> correctStrings)
         {
             // nullだったらメッセージを表示して終了
-            if (CorrectData.Count() == 0)
+            if (correctStrings.Count() == 0)
             {
                 ErrorExit("計算できるデータはありません。");
             }
-
-            // 各人物の情報を格納するPersonのリストを生成する
+            // 各個人の情報を格納するPersonのリストを生成する
             List<Person> People = new List<Person>();
-            
-            // 人物情報をlistに格納する
-            foreach (var c in CorrectData)
+            // 値段をlistに格納する
+            foreach(var c in correctStrings)
             {
-                People.Add(new Person(int.Parse(c[0]), c[1], int.Parse(c[2])));
-            }
+                People.Add(new Person(c[0], c[1], int.Parse(c[2])));
+            }           
             return People;
         }
-
+        
         /// <summary>
-        /// エラーが出た場合終了
+        /// エラー発生時に終了する
         /// </summary>
         /// <param name="message">エラー内容</param>
         private static void ErrorExit(string message)
@@ -127,15 +152,28 @@ namespace Data_practice
             Console.WriteLine("Error: " + message);
             Environment.Exit(-1);
         }
-
+        
         /// <summary>
-        /// 異常データがあった場合に行数とエラーメッセージを表示
+        /// 異常データがあった場合に行数とエラーメッセージを表示する
         /// </summary>
         /// <param name="lineNum">行数</param>
         /// <param name="message">エラー内容</param>
-        private static void ShowErrorMessage(int lineNum, string message)
+        public static void ShowErrorMessage(int lineNum, string message)
         {
             Console.WriteLine("Error: (L" + lineNum + ") " + message);
         }
+
+        /// <summary>
+        /// 文字列をUTF-8に変換する
+        /// </summary>
+        /// <param name="src">変換する文字列</param>
+        // private static string ConvertEncoding(string src)
+        // {
+        //     //まずはバイト配列に変換する
+        //     byte[] bytesUTF8 = System.Text.Encoding.Default.GetBytes(src);
+
+        //     //バイト配列をUTF8の文字コードとしてStringに変換する
+        //     return System.Text.Encoding.UTF8.GetString(bytesUTF8);
+        // }
     }
 }
