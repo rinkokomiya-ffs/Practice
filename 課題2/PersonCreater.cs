@@ -29,6 +29,7 @@ namespace Data_practice
         public static List<string> ReadCsvFile(string fileName)
         {
             // 1. ファイルが存在するかどうか確認する
+            // 2. ファイルに読み取り権限があるかどうか確認する
             if (!File.Exists(fileName))
             {
                 // ファイルが存在しない場合は終了する
@@ -63,7 +64,7 @@ namespace Data_practice
             foreach(var line in strings)
             {
                 lineNum++;
-                // 2. 空行がある場合
+                // 3. 空行がある場合
                 if (line == "")
                 {
                     ShowErrorMessage(lineNum, "空行が含まれています。");
@@ -74,8 +75,7 @@ namespace Data_practice
                 // コンマ区切りのデータを格納
                 string[] Data = line.Split(',');
 
-                // 3. データが３つあるかどうか確認する
-                // ３つない場合
+                // 4. データが３つあるかどうか確認する
                 if (Data.Length != 3)
                 {
                     ShowErrorMessage(lineNum, "データがフォーマットに沿ってません。");
@@ -83,7 +83,7 @@ namespace Data_practice
                 }
 
                 // Data Validation
-                // 4. 社員番号が1から始まる数字8桁かどうか
+                // 5. 社員番号が1から始まる数字8桁かどうか
                 // 正規表現で判定する
                 bool isId = Regex.IsMatch(Data[0], "^1[0-9]{7}$");
                 if(!isId)
@@ -92,25 +92,25 @@ namespace Data_practice
                     continue;
                 }
 
-                // 5. 名前が空かどうか
+                // 6. 名前が空かどうか
                 if(Data[1] == "")
                 {
                     ShowErrorMessage(lineNum, "名前が入力されていません。");
                     continue;
                 }
 
-                // 文字コードを判定して文字化けしないようにする
+                // 7. 文字コードを判定して文字化けしないようにする
                 // Data[1] = ConvertEncoding(Data[1]);
 
                 int myMoney = 0;
                 // 値段が正常値かどうか確認する
-                // 数値でない、もしくは空白の場合
+                // 8. 数値でない、もしくは空白の場合
                 if (!int.TryParse(Data[2], out myMoney))
                 {
                     ShowErrorMessage(lineNum, "お小遣いの金額が正しく入力されていません。");
                     continue;
                 }
-                // 値が正かどうか確認する
+                // 9. 値が正かどうか確認する
                 if(myMoney < 0)
                 {
                     ShowErrorMessage(lineNum, "お小遣いの金額が負です");
@@ -128,7 +128,7 @@ namespace Data_practice
         /// <param name="correctStrings">正常なデータ</param>
         private static List<Person> ConvertPerson(List<string[]> correctStrings)
         {
-            // nullだったらメッセージを表示して終了
+            // 10. nullだったらメッセージを表示して終了
             if (correctStrings.Count() == 0)
             {
                 ErrorExit("計算できるデータはありません。");

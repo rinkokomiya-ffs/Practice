@@ -13,12 +13,15 @@ namespace Data_practice
     {
         static void Main(string[] args)
         {
-            // AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            //ファイル名をコンソールから入力する
+            // 集約例外ハンドラの登録
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+            // ファイル名をコンソールから入力する
             // Console.WriteLine("CSVファイル名を入力してください。");
             // string fileName = Console.ReadLine();
-            try
-            {
+
+            //try
+            //{
                 string fileName = "SampleData.txt";
             
                 // 人物リスト作成
@@ -27,23 +30,36 @@ namespace Data_practice
                 // 会社ごとに結果を出力する
                 Execute.OutputResult(People, "FF");
                 Execute.OutputResult(People, "FFS");
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine("想定外のエラーが発生しました。");
-                Console.WriteLine(ex.ToString());
-            }
+            //}
+            //catch(Exception ex)
+            //{
+            //    Console.WriteLine("想定外のエラーが発生しました。");
+            //    Console.WriteLine(ex.ToString());
+            //}
         }
 
-        // private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        // {
-        //     var exception = e.ExceptionObject as Exception;
-        //     if (exception == null)
-        //     {
-        //         Console.WriteLine("System.Exceptionとして扱えない例外");
-        //         return;
-        //     }
-        // }
+        /// <summary>
+        /// 集約例外ハンドラ（想定外のエラーをキャッチする）
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            // 11. ファイルが壊れている 
+            // 12. ファイルがロックされている
+            try
+            {
+                Exception ex = (Exception)e.ExceptionObject;
+
+                //エラー処理
+                Console.WriteLine("集約例外ハンドラで例外をキャッチしました。アプリケーションを終了します。");
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                Environment.Exit(-1); 
+            }
+        }
 
     }
 }

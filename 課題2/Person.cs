@@ -5,12 +5,12 @@ namespace Data_practice
     /// </summary>
     public class Person
     {
-        public int id { get; set; }
+        public string id { get; set; }
         public string name { get; set; }
         public int money { get; set; }
         public string company { get; set; }
 
-        public Person(int id, string name, int money)
+        public Person(string id, string name, int money)
         {
             this.id = id;
             this.name = name;
@@ -23,14 +23,14 @@ namespace Data_practice
         /// </summary>
         /// <param name="id">社員番号</param>
         /// <returns>会社名</returns>
-        private string CheckCompany(int id)
+        private string CheckCompany(string id)
         {
-            int topThreeDigit = id / 100000;
-            if (topThreeDigit == 128)
+            string topThreeDigit = id.Substring(0, 3);
+            if (topThreeDigit == "128")
             {
                 return "FFS";
             }
-            else if (topThreeDigit == 100)
+            else if (topThreeDigit == "100")
             {
                 return "FF";
             }
