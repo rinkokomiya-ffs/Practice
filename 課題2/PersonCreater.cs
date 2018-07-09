@@ -61,7 +61,7 @@ namespace Data_practice
             
             int lineNum = 0;
 
-            foreach(var line in strings)
+            foreach (var line in strings)
             {
                 lineNum++;
                 // 3. 空行がある場合
@@ -82,44 +82,58 @@ namespace Data_practice
                     continue;
                 }
 
-                // Data Validation
-                // 5. 社員番号が1から始まる数字8桁かどうか
-                // 正規表現で判定する
-                bool isId = Regex.IsMatch(Data[0], "^1[0-9]{7}$");
-                if(!isId)
+                // データの中身の形式が正しいか確認する
+                if (DataValidation(Data, lineNum))
                 {
-                    ShowErrorMessage(lineNum, "社員番号が正しく入力されていません。");
-                    continue;
+                    correctStrings.Add(Data);
                 }
-
-                // 6. 名前が空かどうか
-                if(Data[1] == "")
-                {
-                    ShowErrorMessage(lineNum, "名前が入力されていません。");
-                    continue;
-                }
-
-                // 7. 文字コードを判定して文字化けしないようにする
-                // Data[1] = ConvertEncoding(Data[1]);
-
-                int myMoney = 0;
-                // 値段が正常値かどうか確認する
-                // 8. 数値でない、もしくは空白の場合
-                if (!int.TryParse(Data[2], out myMoney))
-                {
-                    ShowErrorMessage(lineNum, "お小遣いの金額が正しく入力されていません。");
-                    continue;
-                }
-                // 9. 値が正かどうか確認する
-                if(myMoney < 0)
-                {
-                    ShowErrorMessage(lineNum, "お小遣いの金額が負です");
-                    continue;
-                }
-                
-                correctStrings.Add(Data);
             }
             return correctStrings;
+        }
+
+        /// <summary>
+        /// 行ごとのデータバリデーション
+        /// </summary>
+        /// <param name="Data">読み込んだデータ1行のコンマ区切りのデータ</param>
+        /// <param name="lineNum">行数</param>
+        private static bool DataValidation(string[] Data, int lineNum)
+        {
+            bool isError = true;
+            // 5. 社員番号が1から始まる数字8桁かどうか
+            // 正規表現で判定する
+            bool isId = Regex.IsMatch(Data[0], "^1[0-9]{7}$");
+            if (!isId)
+            {
+                ShowErrorMessage(lineNum, "社員番号が正しく入力されていません。");
+                isError = false;
+            }
+
+            // 6. 名前が空かどうか
+            if (Data[1] == "")
+            {
+                ShowErrorMessage(lineNum, "名前が入力されていません。");
+                isError = false;
+            }
+
+            // 7. 文字コードを変換して文字化けしないようにする
+            // Data[1] = ConvertEncoding(Data[1]);
+
+            int myMoney = 0;
+            // 値段が正常値かどうか確認する
+            // 8. 数値でない、もしくは空白の場合
+            if (!int.TryParse(Data[2], out myMoney))
+            {
+                ShowErrorMessage(lineNum, "お小遣いの金額が正しく入力されていません。");
+                isError = false;
+            }
+            // 9. 値が正かどうか確認する
+            if (myMoney < 0)
+            {
+                ShowErrorMessage(lineNum, "お小遣いの金額が負です");
+                isError = false;
+            }
+
+            return isError;
         }
         
         /// <summary>
@@ -136,7 +150,7 @@ namespace Data_practice
             // 各個人の情報を格納するPersonのリストを生成する
             List<Person> People = new List<Person>();
             // 値段をlistに格納する
-            foreach(var c in correctStrings)
+            foreach (var c in correctStrings)
             {
                 People.Add(new Person(c[0], c[1], int.Parse(c[2])));
             }           

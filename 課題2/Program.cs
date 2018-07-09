@@ -29,6 +29,7 @@ namespace Data_practice
 
                 // 会社ごとに結果を出力する
                 Execute.OutputResult(People, "FF");
+                Console.WriteLine();
                 Execute.OutputResult(People, "FFS");
             //}
             //catch(Exception ex)
